@@ -30,7 +30,7 @@ if $has_branch_flag;
 
 URL="http://github.com/$USER/$REPO/archive/$BRANCH.tar.gz"
 
-wget -qO- $URL | tar -xvz --one-top-level=$REPO
+wget -qO- $URL | tar -xvz --one-top-level=$REPO --strip-components 1
 
 echo "Cleaning up..."
 rm -rf $REPO.tar.gz
