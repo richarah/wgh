@@ -1,17 +1,7 @@
 #!/bin/bash
 # TODO: make sh-compatible
 
-OLDIFS=$IFS
-
-IFS='/'
-read -a strarr <<<"$1"
-USER=${strarr[0]}
-REPO=${strarr[1]} 
-BRANCH=$2
-
-# Reset IFS to prevent trouble later
-IFS=$OLDIFS
-
+# Needs further testing
 has_branch_flag=false
 while getopts :ht opt; do
     case $opt in
@@ -20,6 +10,16 @@ while getopts :ht opt; do
        \?) echo "Unknown option -$OPTARG"; exit 1;;
     esac
 done
+
+OLDIFS=$IFS
+IFS='/'
+read -a strarr <<<"$1"
+USER=${strarr[0]}
+REPO=${strarr[1]} 
+BRANCH=$2
+
+# Reset IFS to prevent trouble later
+IFS=$OLDIFS
 
 if $has_branch_flag;
   then
@@ -30,7 +30,7 @@ if $has_branch_flag;
 
 URL="http://github.com/$USER/$REPO/archive/$BRANCH.tar.gz"
 
-wget -qO- $URL | tar -xvz --one-top-level=$REPO --strip-components 1
+wget -qO- $URL | tar -xvz --one-top-level=$REPO --strip-components 1 
 
 echo "Cleaning up..."
 rm -rf $REPO.tar.gz
