@@ -1,13 +1,16 @@
 #!/bin/bash
 # TODO: make sh-compatible
 
-# Split user and repo on delimiter
+OLDIFS=$IFS
+
 IFS='/'
 read -a strarr <<<"$1"
-
 USER=${strarr[0]}
 REPO=${strarr[1]} 
 BRANCH=$2
+
+# Reset IFS to prevent trouble later
+IFS=$OLDIFS
 
 has_branch_flag=false
 while getopts :ht opt; do
@@ -20,26 +23,14 @@ done
 
 if $has_branch_flag;
   then
-    wget http://github.com/$USER/$REPO/archive/$BRANCH.tar.gz
+    BRANCH=$2
  else
-    wget http://github.com/$USER/$REPO/archive/master.tar.gz
+    BRANCH="master"
  fi
 
-# Use pigz (parallel implementation of gzip) if available
-# WIP: refactoring
-if which pigz >/dev/null; then
-    echo "Decompressing with pigz..."
-    pigz -dc *.tar.gz | tar -xv
-else
-    echo "Decompressing with tar..."
-    tar -xvf *.tar.gz
-fi
+URL="http://github.com/$USER/$REPO/archive/$BRANCH.tar.gz"
 
+wget -qO- $URL | tar -xvz --one-top-level=$REPO
 
 echo "Cleaning up..."
-if $has_branch_flag;
-  then
-    rm -rfv $REPO-$BRANCH.tar.gz
- else
-    rm -rfv $REPO-master.tar.gz
- fi
+rm -rf $REPO.tar.gz
