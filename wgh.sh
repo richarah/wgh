@@ -27,10 +27,6 @@ if $has_branch_flag;
  else
     BRANCH="master"
  fi
-
+echo "Fetching $USER/$REPO to $PWD/$REPO..."
 URL="http://github.com/$USER/$REPO/archive/$BRANCH.tar.gz"
-
 wget -qO- $URL | tar -xvz --one-top-level=$REPO --strip-components 1 
-
-echo "Cleaning up..."
-rm -rf $REPO.tar.gz
