@@ -1,4 +1,13 @@
-#!/bin/sh
+#!/bin/bash
+# TODO: make sh-compatible
+
+# Split user and repo on delimiter
+IFS='/'
+read -a strarr <<<"$1"
+
+USER=${strarr[0]}
+REPO=${strarr[1]} 
+BRANCH=$2
 
 has_branch_flag=false
 while getopts :ht opt; do
@@ -11,12 +20,13 @@ done
 
 if $has_branch_flag;
   then
-    wget http://github.com/$1/archive/$2.tar.gz
+    wget http://github.com/$USER/$REPO/archive/$BRANCH.tar.gz
  else
-    wget http://github.com/$1/archive/master.tar.gz
+    wget http://github.com/$USER/$REPO/archive/master.tar.gz
  fi
 
 # Use pigz (parallel implementation of gzip) if available
+# WIP: refactoring
 if which pigz >/dev/null; then
     echo "Decompressing with pigz..."
     pigz -dc *.tar.gz | tar -xv
@@ -25,12 +35,11 @@ else
     tar -xvf *.tar.gz
 fi
 
-# BUG: dirname should not include branch
 
 echo "Cleaning up..."
 if $has_branch_flag;
   then
-    rm -rf $2.tar.gz
+    rm -rfv $REPO-$BRANCH.tar.gz
  else
-    rm -rf master.tar.gz
+    rm -rfv $REPO-master.tar.gz
  fi
